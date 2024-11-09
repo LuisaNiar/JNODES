@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: bff/Dockerfile
+    image: luisaniar/jnodes-bff
     ports:
       - "8080:8080"
     networks:
@@ -13,6 +14,7 @@ services:
     build:
       context: .
       dockerfile: front/Dockerfile
+    image: luisaniar/jnodes-frontend:latest
     ports:
       - "3000:3000"
     depends_on:
@@ -23,3 +25,4 @@ services:
 networks:
   app-network:
     driver: bridge
+

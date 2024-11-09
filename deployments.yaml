@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-bff
+  name: deployment-jnodes
 spec:
   replicas: 1
   selector:
@@ -17,24 +17,6 @@ spec:
           image: luisaniar/jnodes-bff:latest
           ports:
             - containerPort: 8080
-
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: deployment-front
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: app2
-  template:
-    metadata:
-      labels:
-        app: app2
-    spec:
-      containers:
         - name: container-front
           image: luisaniar/jnodes-frontend:latest
           ports:
