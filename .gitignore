@@ -1,0 +1,47 @@
+# Node.js dependencies
+node_modules/
+bff/node_modules
+front/node_modules
+
+# Build output directories
+bff/dist
+front/build
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+/bff/logs
+/front/logs
+
+# Environment variables
+.env
+bff/.env
+front/.env
+
+# Docker-related files
+**/Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE and editor directories
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Temporary files and backups
+*.swp
+*.bak
+*.tmp
+
+# Coverage and testing reports
+/coverage
+/.nyc_output
+
+# Ignore any production-specific files or directories
+*.env.production
+.env.local

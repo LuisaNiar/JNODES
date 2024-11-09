@@ -1,0 +1,25 @@
+version: '3'
+services:
+  bff:
+    build:
+      context: .
+      dockerfile: bff/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - bff
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

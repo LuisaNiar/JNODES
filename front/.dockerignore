@@ -1,0 +1,10 @@
+# Ignorar archivos innecesarios
+node_modules
+npm-debug.log
+.DS_Store
+.git
+.gitignore
+.env
+
+# Ignorar la carpeta build si se construye en el contenedor
+build
