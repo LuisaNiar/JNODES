@@ -1,17 +1,21 @@
 # Use a base image of Node.js
-FROM node:18
+FROM node:18-alpine
 
 # Create a working directory
 WORKDIR /app
 
-# Copy package.json files from the project root (assuming they’re in the `bff` directory)
+# Copy package.json files from the project root (`bff` directory)
 COPY bff/package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --omit=dev
 
 # Copy all files from the `bff` directory
 COPY bff/ .
+
+# Usa un usuario no root para mayor seguridad
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
 # Expose port 8080
 EXPOSE 8080
