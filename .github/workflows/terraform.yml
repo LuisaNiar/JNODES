@@ -22,7 +22,6 @@ jobs:
       - name: Set Terraform token
         run: echo "TF_TOKEN_app_terraform_io=${{ secrets.TF_API_TOKEN }}" >> $GITHUB_ENV
 
-
       - name: Terraform Init
         run: terraform init
         env:
@@ -48,8 +47,10 @@ jobs:
       - name: Docker login
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      - name: Docker Build BFF
+        run: docker build -t jnodes-bff:latest ./bff
+
       - name: Docker Tag & Push
         run: |
           docker tag jnodes-bff:latest luisaniar/jnodes-bff:latest
           docker push luisaniar/jnodes-bff:latest
-                
