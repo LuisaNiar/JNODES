@@ -1,4 +1,4 @@
-# JNODES – Reto de Automatización de Entorno (DevOps Practicante)
+# JNODES – Reto de Automatización de Entorno 
 
 Este proyecto es un reto de desarrollo, cuyo propósito es desplegar una aplicación web sencilla utilizando herramientas clave de la cultura DevOps: **Docker**, **GitHub Actions** y **Terraform**. A través de este ejercicio se busca demostrar habilidades prácticas en contenerización, integración continua, despliegue automatizado e infraestructura como código.
 
@@ -20,7 +20,7 @@ Desarrollar y automatizar el despliegue de una aplicación web compuesta por un 
 ```
 JNODES/
 ├── .github/workflows/           # Workflows de CI/CD
-│   ├── bff-ci.yml               # Pipeline para construir y subir imagen del BFF
+│   ├── bff-ci.yml               # Pipeline para validar y subir imagen del BFF
 │   └── terraform.yml            # Pipeline para ejecutar Terraform
 │
 ├── bff/                         # Backend for Frontend (Node.js)
@@ -42,10 +42,10 @@ JNODES/
 │   └── variables.tf             
 │
 ├── main.tf                      # Archivo principal de infraestructura (Terraform)
-│
 ├── docker-compose.yml           # Orquestación local de contenedores
 ├── deployments.yaml             # (K8S Opcional) Definición adicional para despliegue
 └── README.md
+
 ```
 
 ---
@@ -54,101 +54,134 @@ JNODES/
 
 ### `bff/`
 
-* API Node.js con rutas HTTP básicas.
-* Contenerizada con `Dockerfile`.
-* Expone servicios para ser consumidos por el frontend.
+* API en Node.js con rutas HTTP básicas.
+* Contenerizada mediante `Dockerfile`.
+* Expone servicios consumidos por el frontend.
 
 ### `front/`
 
-* Interfaz de usuario desarrollada en React.
-* Consume el backend (`bff`).
-* También contenerizada para facilitar despliegue.
+* Interfaz de usuario en React.
+* Consume el backend.
+* También contenerizada con `Dockerfile`.
 
 ---
 
 ## ⚙️ Contenerización y Ejecución Local
 
-Los servicios `bff` y `front` están contenerizados y orquestados con Docker Compose.
-
-### Ejecutar localmente
+Para levantar la aplicación localmente:
 
 ```bash
 docker compose up --build
 ```
 
-Este comando construye y ejecuta los contenedores desde la raíz del proyecto.
+Esto construye y levanta ambos servicios (`bff` y `front`) en contenedores conectados.
 
 ---
 
-## 🔄 Automatización CI/CD
+## 🔄 Automatización CI/CD con GitHub Actions
 
-GitHub Actions automatiza tareas como:
+El proyecto incluye dos workflows:
 
-* Validación del código (`terraform validate`, `npm run lint`)
-* Construcción y push de imágenes Docker (`bff`)
-* Ejecución de `terraform plan` y `terraform apply`
+### 🧪 `bff-ci.yml`: Validación y despliegue del backend
 
-### Workflows incluidos
+* **Job `validate`**:
 
-* `.github/workflows/bff-ci.yml`: Automatiza el build, validación (`npm run lint`) y push de la imagen `bff` a Docker Hub.
-* `.github/workflows/terraform.yml`: Ejecuta Terraform desde la raíz del proyecto.
+  * Instala dependencias del backend
+  * Ejecuta ESLint para análisis estático del código
+  * Continúa incluso si hay advertencias
+
+* **Job `build-and-push`**:
+
+  * Inicia sesión en Docker Hub
+  * Construye imagen del backend con Buildx
+  * Publica imagen `luisaniar/jnodes-bff:latest` en Docker Hub
+
+> ESLint está configurado para ejecutarse exclusivamente en GitHub Actions.
 
 ---
+### ⚙️ `terraform.yml`: Plan & Apply de Terraform
 
-## 🧹 Validación de Código (Linting)
+Este workflow automatiza la ejecución de Terraform utilizando **Terraform Cloud** como backend remoto.
 
-El proyecto incluye verificación de estilo y calidad de código para el backend mediante `npm run lint`. Esto ayuda a prevenir errores de sintaxis y mantener estándares de desarrollo consistentes.
+#### Flujo del pipeline (`.github/workflows/terraform.yml`):
 
-Para ejecutarlo manualmente:
+1. **Checkout del repositorio**
+   Descarga el código fuente del repositorio para trabajar con él.
 
-```bash
-cd bff
-npm install
-npm run lint
+2. **Seteo del token para Terraform Cloud**
+   Establece la variable de entorno `TF_TOKEN_app_terraform_io` a partir del secret `TF_API_TOKEN` para autenticación automática con Terraform Cloud.
+
+3. **Instalación de Terraform**
+   Utiliza `hashicorp/setup-terraform` para instalar la versión 1.5.7.
+
+4. **Inicialización del entorno Terraform**
+   Ejecuta `terraform init` para conectarse al backend remoto definido en `main.tf`.
+
+5. **Validación del código Terraform**
+   Verifica que la configuración esté bien escrita con `terraform validate`.
+
+6. **Planificación de cambios**
+   Muestra el plan de acciones con `terraform plan` para ver qué se aplicará.
+
+7. **Aplicación automática (solo en rama `main`)**
+   Ejecuta `terraform apply -auto-approve` para aplicar automáticamente los cambios definidos.
+
+#### Backend remoto en `main.tf`:
+
+```hcl
+terraform {
+  backend "remote" {
+    organization = "jnodes"
+
+    workspaces {
+      name = "JNODES"
+    }
+  }
+}
 ```
+* Aplica un módulo llamado `push_bff`, que simula el push de imagen usando `null_resource`.
 
-> Asegúrate de que `package.json` en `bff/` tenga el script configurado:
+> Este enfoque permite mantener el estado centralizado y compartido en Terraform Cloud, y facilita la colaboración.
 
-```json
-"scripts": {
-  "lint": "eslint ."
+---
+
+## ☁️ ¿Qué hace el módulo `docker_push`?
+
+El módulo `modules/docker_push/` es un componente reutilizable que simula el despliegue de una imagen Docker utilizando Terraform. Aunque no ejecuta realmente `docker push`, sí cumple los principios de Infraestructura como Código al:
+
+* Declarar el nombre de la imagen (`image_name`)
+* Declarar el usuario Docker Hub (`docker_user`)
+* Declarar el tag (`tag`)
+* Ejecutar una acción mediante `null_resource` (como placeholder)
+
+**Ejemplo de uso en `main.tf`:**
+
+```hcl
+module "push_bff" {
+  source      = "./modules/docker_push"
+  image_name  = "jnodes-bff"
+  docker_user = "luisaniar"
+  tag         = "latest"
 }
 ```
 
-> ESLint puede configurarse usando `npx eslint --init` en la carpeta del backend.
+Esto permite simular un entorno declarativo, reutilizable y automatizado.
 
 ---
 
 ## 🔐 Secrets Requeridos
 
-Configura los siguientes secrets en GitHub:
-
-| Secret            | Descripción                               |
-| ----------------- | ----------------------------------------- |
-| `TF_API_TOKEN`    | Token de autenticación de Terraform Cloud |
-| `DOCKER_USERNAME` | Usuario de Docker Hub                     |
-| `DOCKER_PASSWORD` | Contraseña de Docker Hub                  |
-
----
-
-## ☁️ Infraestructura como Código (Terraform)
-
-Los archivos `main.tf` y `variables.tf` definen los recursos necesarios para desplegar la aplicación. El proyecto incluye un módulo (`modules/docker_push/`) para parametrizar el envío de imágenes Docker.
-
-### Comandos útiles
-
-```bash
-terraform init
-terraform validate
-terraform plan
-terraform apply -auto-approve
-```
+| Secret            | Descripción                                 |
+| ----------------- | ------------------------------------------- |
+| `TF_API_TOKEN`    | Token de autenticación para Terraform Cloud |
+| `DOCKER_USERNAME` | Usuario de Docker Hub                       |
+| `DOCKER_PASSWORD` | Contraseña de Docker Hub                    |
 
 ---
 
 ## 📌 Conclusión
 
-Este proyecto demuestra una implementación completa de un entorno DevOps moderno. Mediante la contenerización, los pipelines CI/CD, la validación automática y la gestión declarativa de infraestructura, se establece una base sólida para despliegues automatizados y entornos reproducibles.
+Este proyecto representa una solución práctica y modular basada en los principios de DevOps. Gracias al uso de contenerización, pipelines CI/CD, linters automatizados y Terraform como gestor declarativo, se demuestra un flujo de despliegue robusto y replicable.
 
 ---
 
