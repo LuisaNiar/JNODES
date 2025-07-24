@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  TF_WORKSPACE: JNODES
   TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
 jobs:
