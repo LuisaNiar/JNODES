@@ -22,20 +22,29 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7 
-          
+
       - name: Terraform Init
         run: terraform -chdir=terraform init
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Format
         run: terraform -chdir=terraform fmt -check
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Validate
         run: terraform -chdir=terraform validate
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Plan
         run: terraform -chdir=terraform plan
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Apply (auto-approve)
         if: github.ref == 'refs/heads/main'
         run: terraform -chdir=terraform apply -auto-approve
-
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
