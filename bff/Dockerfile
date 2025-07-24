@@ -11,7 +11,7 @@ COPY bff/package*.json ./
 RUN npm install --omit=dev
 
 # Copy all files from the `bff` directory
-COPY bff/ .
+COPY . .
 
 # Usa un usuario no root para mayor seguridad
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
