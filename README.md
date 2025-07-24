@@ -74,7 +74,11 @@ Para levantar la aplicación localmente:
 docker compose up --build
 ```
 
+<img width="492" height="116" alt="image" src="https://github.com/user-attachments/assets/7862a88f-3968-428f-8b04-5ebe2fdf5492" />
+
 Esto construye y levanta ambos servicios (`bff` y `front`) en contenedores conectados.
+
+<img width="998" height="595" alt="image" src="https://github.com/user-attachments/assets/b63cc105-f73f-4c80-bcd5-d9a39d559ec6" />
 
 ---
 
@@ -97,6 +101,8 @@ El proyecto incluye dos workflows:
   * Publica imagen `luisaniar/jnodes-bff:latest` en Docker Hub
 
 > ESLint está configurado para ejecutarse exclusivamente en GitHub Actions.
+
+<img width="1295" height="758" alt="image" src="https://github.com/user-attachments/assets/c3f46f35-e2a7-4f17-8377-014a2c8271c4" />
 
 ---
 ### ⚙️ `terraform.yml`: Plan & Apply de Terraform
@@ -140,6 +146,8 @@ terraform {
 }
 ```
 * Aplica un módulo llamado `push_bff`, que simula el push de imagen usando `null_resource`.
+
+<img width="1294" height="767" alt="image" src="https://github.com/user-attachments/assets/36d9245a-335d-4ae3-be96-03888ee854df" />
 
 > Este enfoque permite mantener el estado centralizado y compartido en Terraform Cloud, y facilita la colaboración.
 
