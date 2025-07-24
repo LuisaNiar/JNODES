@@ -21,7 +21,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.5.7 
 
       - name: Terraform Init
         run: terraform -chdir=terraform init
@@ -38,5 +38,3 @@ jobs:
       - name: Terraform Apply (auto-approve)
         if: github.ref == 'refs/heads/main'
         run: terraform -chdir=terraform apply -auto-approve
-
-        
