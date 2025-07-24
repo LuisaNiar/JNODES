@@ -22,6 +22,10 @@ jobs:
         with:
           terraform_version: 1.5.7 
 
+      - name: Set Terraform token
+        run: echo "TF_TOKEN_app_terraform_io=${{ secrets.TF_API_TOKEN }}" >> $GITHUB_ENV
+
+
       - name: Terraform Init
         run: terraform init
         env:
