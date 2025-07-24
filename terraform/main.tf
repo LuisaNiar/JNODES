@@ -1,6 +1,6 @@
 terraform {
   backend "remote" {
-    organization = "jnodes-org"
+    organization = "jnodes"
     workspaces {
       name = "docker-image-push"
     }
