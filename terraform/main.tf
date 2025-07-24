@@ -14,3 +14,4 @@ module "push_bff" {
   docker_user = "luisaniar"
   tag         = "latest"
 }
+ 
