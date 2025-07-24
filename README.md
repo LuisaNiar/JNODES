@@ -44,7 +44,7 @@ JNODES/
 ├── main.tf                      # Archivo principal de infraestructura (Terraform)
 │
 ├── docker-compose.yml           # Orquestación local de contenedores
-├── deployments.yaml             # (Opcional – Kubernetes) Manifiesto para despliegue en K8s
+├── deployments.yaml             # (K8S Opcional) Definición adicional para despliegue
 └── README.md
 ```
 
@@ -90,8 +90,32 @@ GitHub Actions automatiza tareas como:
 
 ### Workflows incluidos
 
-* `.github/workflows/bff-ci.yml`: Automatiza el build y push de la imagen `bff` a Docker Hub.
+* `.github/workflows/bff-ci.yml`: Automatiza el build, validación (`npm run lint`) y push de la imagen `bff` a Docker Hub.
 * `.github/workflows/terraform.yml`: Ejecuta Terraform desde la raíz del proyecto.
+
+---
+
+## 🧹 Validación de Código (Linting)
+
+El proyecto incluye verificación de estilo y calidad de código para el backend mediante `npm run lint`. Esto ayuda a prevenir errores de sintaxis y mantener estándares de desarrollo consistentes.
+
+Para ejecutarlo manualmente:
+
+```bash
+cd bff
+npm install
+npm run lint
+```
+
+> Asegúrate de que `package.json` en `bff/` tenga el script configurado:
+
+```json
+"scripts": {
+  "lint": "eslint ."
+}
+```
+
+> ESLint puede configurarse usando `npx eslint --init` en la carpeta del backend.
 
 ---
 
@@ -124,7 +148,7 @@ terraform apply -auto-approve
 
 ## 📌 Conclusión
 
-Este proyecto demuestra una implementación completa de un entorno DevOps moderno. Mediante la contenerización, los pipelines CI/CD y la gestión declarativa de infraestructura, se establece una base sólida para despliegues automatizados y entornos reproducibles.
+Este proyecto demuestra una implementación completa de un entorno DevOps moderno. Mediante la contenerización, los pipelines CI/CD, la validación automática y la gestión declarativa de infraestructura, se establece una base sólida para despliegues automatizados y entornos reproducibles.
 
 ---
 
