@@ -5,9 +5,13 @@ on:
     branches:
       - main
 
+env:
+  TF_WORKSPACE: JNODES
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
 jobs:
   terraform:
-    name: Terraform Plan & Apply
+    name: Terraform Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -17,40 +21,17 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.7 
-
-      - name: Set Terraform token
-        run: echo "TF_TOKEN_app_terraform_io=${{ secrets.TF_API_TOKEN }}" >> $GITHUB_ENV
+          terraform_version: 1.5.7
 
       - name: Terraform Init
         run: terraform init
-        env:
-          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform Format
-        run: terraform fmt -check
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan
-        env:
-          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Terraform Apply (auto-approve)
+      - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
-        env:
-          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Docker login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Docker Build BFF
-        run: docker build -t jnodes-bff:latest ./bff
-
-      - name: Docker Tag & Push
-        run: |
-          docker tag jnodes-bff:latest luisaniar/jnodes-bff:latest
-          docker push luisaniar/jnodes-bff:latest
