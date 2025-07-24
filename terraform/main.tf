@@ -1,13 +1,15 @@
-module "push_bff_image" {
-  source      = "./modules/docker_push"
-  image_name  = "jnodes-bff"
-  tag         = "latest"
-  docker_user = "luisaniar"
+terraform {
+  backend "remote" {
+    organization = "jnodes-org"
+    workspaces {
+      name = "docker-image-push"
+    }
+  }
 }
 
-module "push_front_image" {
+module "push_bff" {
   source      = "./modules/docker_push"
-  image_name  = "jnodes-frontend"
-  tag         = "latest"
+  image_name  = "jnodes-bff"
   docker_user = "luisaniar"
+  tag         = "latest"
 }
