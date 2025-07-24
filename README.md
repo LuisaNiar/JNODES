@@ -1,50 +1,134 @@
 # JNODES – Reto de Automatización de Entorno (DevOps Practicante)
 
-Este proyecto forma parte del reto de automatización DevOps, cuyo objetivo es desplegar una aplicación web sencilla utilizando Docker, GitHub Actions y Terraform como herramientas principales.
+Este proyecto es un reto de desarrollo, cuyo propósito es desplegar una aplicación web sencilla utilizando herramientas clave de la cultura DevOps: **Docker**, **GitHub Actions** y **Terraform**. A través de este ejercicio se busca demostrar habilidades prácticas en contenerización, integración continua, despliegue automatizado e infraestructura como código.
 
-## Aplicación
+---
 
-Se trata de una aplicación construida con Node.js que expone rutas HTTP básicas. Su propósito es servir como base funcional para la contenerización y el despliegue automatizado.
+## 🎯 Objetivo del Proyecto
 
-## Estructura del proyecto
+Desarrollar y automatizar el despliegue de una aplicación web compuesta por un backend en Node.js y un frontend en React. El flujo completo considera:
 
-* `bff/`: Backend for Frontend desarrollado en Node.js
-* `front/`: Frontend desarrollado en React
-* `modules/docker_push/`: Módulo de Terraform para realizar el push de imágenes Docker
-* `.github/workflows/`: Workflows de CI/CD configurados para GitHub Actions
-* `docker-compose.yml`: Define los servicios y la red de Docker
-* `main.tf` y `variables.tf`: Definición de infraestructura como código con Terraform
+* Contenerización con Docker.
+* Orquestación local con Docker Compose.
+* Automatización CI/CD con GitHub Actions.
+* Despliegue e infraestructura como código con Terraform.
 
-## Contenerización
+---
 
-Tanto el backend (`bff`) como el frontend (`front`) están contenerizados mediante archivos Dockerfile. Se siguen buenas prácticas de construcción para imágenes livianas y reutilizables.
+## 🧩 Estructura del Proyecto
 
-## Ejecución local
+```
+JNODES/
+├── .github/workflows/           # Workflows de CI/CD
+│   ├── bff-ci.yml               # Pipeline para construir y subir imagen del BFF
+│   └── terraform.yml            # Pipeline para ejecutar Terraform
+│
+├── bff/                         # Backend for Frontend (Node.js)
+│   ├── index.js
+│   ├── server.js
+│   ├── package.json
+│   ├── Dockerfile
+│   └── .dockerignore
+│
+├── front/                       # Frontend en React
+│   ├── public/
+│   ├── src/
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── package.json
+│
+├── modules/docker_push/         # Módulo de Terraform para subir imágenes Docker
+│   ├── main.tf
+│   └── variables.tf             
+│
+├── main.tf                      # Archivo principal de infraestructura (Terraform)
+│
+├── docker-compose.yml           # Orquestación local de contenedores
+├── deployments.yaml             # (Opcional – Kubernetes) Manifiesto para despliegue en K8s
+└── README.md
+```
 
-Para ejecutar la aplicación localmente, se debe construir y levantar con Docker Compose desde la raíz del proyecto, lo que levantará tanto el frontend como el backend. También es posible construir y ejecutar cada contenedor por separado, navegando a las carpetas correspondientes.
+---
 
-## Automatización CI/CD
+## 🖥️ Componentes de la Aplicación
 
-El pipeline ubicado en `.github/workflows/` automatiza las siguientes tareas:
+### `bff/`
 
-* Validación del código (por ejemplo, `terraform validate`, `npm run lint`)
-* Construcción de imágenes Docker para `bff` y `front`
-* Push automático de las imágenes a Docker Hub usando secrets
-* Ejecución de `terraform plan` y `terraform apply` mediante GitHub Actions
+* API Node.js con rutas HTTP básicas.
+* Contenerizada con `Dockerfile`.
+* Expone servicios para ser consumidos por el frontend.
 
-### Gestión de secretos
+### `front/`
 
-Los secrets utilizados se definen en la sección de GitHub Secrets del repositorio:
+* Interfaz de usuario desarrollada en React.
+* Consume el backend (`bff`).
+* También contenerizada para facilitar despliegue.
 
-* `TF_API_TOKEN`: Token de acceso para Terraform Cloud
-* `DOCKER_USERNAME`: Usuario de Docker Hub
-* `DOCKER_PASSWORD`: Contraseña de Docker Hub
+---
 
-## Infraestructura como código
+## ⚙️ Contenerización y Ejecución Local
 
-Se utiliza Terraform para definir la infraestructura del proyecto, con un módulo personalizado (`modules/docker_push/`) que permite parametrizar el nombre, tag y repositorio de las imágenes Docker.
+Los servicios `bff` y `front` están contenerizados y orquestados con Docker Compose.
 
-## Autor
+### Ejecutar localmente
 
-Luisa Fernanda Niño Ardila
-Repositorio: [JNODES](https://github.com/LuisaNiar/JNODES)
+```bash
+docker compose up --build
+```
+
+Este comando construye y ejecuta los contenedores desde la raíz del proyecto.
+
+---
+
+## 🔄 Automatización CI/CD
+
+GitHub Actions automatiza tareas como:
+
+* Validación del código (`terraform validate`, `npm run lint`)
+* Construcción y push de imágenes Docker (`bff`)
+* Ejecución de `terraform plan` y `terraform apply`
+
+### Workflows incluidos
+
+* `.github/workflows/bff-ci.yml`: Automatiza el build y push de la imagen `bff` a Docker Hub.
+* `.github/workflows/terraform.yml`: Ejecuta Terraform desde la raíz del proyecto.
+
+---
+
+## 🔐 Secrets Requeridos
+
+Configura los siguientes secrets en GitHub:
+
+| Secret            | Descripción                               |
+| ----------------- | ----------------------------------------- |
+| `TF_API_TOKEN`    | Token de autenticación de Terraform Cloud |
+| `DOCKER_USERNAME` | Usuario de Docker Hub                     |
+| `DOCKER_PASSWORD` | Contraseña de Docker Hub                  |
+
+---
+
+## ☁️ Infraestructura como Código (Terraform)
+
+Los archivos `main.tf` y `variables.tf` definen los recursos necesarios para desplegar la aplicación. El proyecto incluye un módulo (`modules/docker_push/`) para parametrizar el envío de imágenes Docker.
+
+### Comandos útiles
+
+```bash
+terraform init
+terraform validate
+terraform plan
+terraform apply -auto-approve
+```
+
+---
+
+## 📌 Conclusión
+
+Este proyecto demuestra una implementación completa de un entorno DevOps moderno. Mediante la contenerización, los pipelines CI/CD y la gestión declarativa de infraestructura, se establece una base sólida para despliegues automatizados y entornos reproducibles.
+
+---
+
+## 👩‍💻 Autora
+
+**Luisa Fernanda Niño Ardila**
+Repositorio: [github.com/LuisaNiar/JNODES](https://github.com/LuisaNiar/JNODES)
